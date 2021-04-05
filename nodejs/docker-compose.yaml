@@ -1,0 +1,21 @@
+version: "3"
+services:
+  hasura-actions:
+    container_name: hasura-actions
+    image: hasura-actions:0.0.1
+    command: npx nodemon server.js
+    #command: tail -f /dev/null
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/code
+    working_dir: /code/src
+    env_file:
+     - ./.env
+    networks:
+      default:
+        aliases:
+          - hasura.actions

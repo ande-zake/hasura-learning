@@ -1,0 +1,42 @@
+version: '3.6'
+services:
+  postgres:
+    image: postgres:12
+    restart: always
+    volumes:
+    - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+    - postgres
+    ports:
+    - 8080:10080
+    ## you can change pgAdmin default username/password with below environment variables
+    environment:
+      PGADMIN_LISTEN_PORT: 10080
+      PGADMIN_DEFAULT_EMAIL: seczake@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+  graphql-engine:
+    image: hasura/graphql-engine:v1.3.3
+    ports:
+    - "9090:8080"
+    depends_on:
+    - "postgres"
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/dvdrental
+      ## enable the console served by server
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      ## uncomment next line to set an admin secret
+      HASURA_GRAPHQL_ADMIN_SECRET: hasuraadmin
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256", "key": "W1UiJa3cwb5y2Rd9kSvb0ZxAqGX9c4Z4zouRU57729ML3V05UA"}'
+      # HASURA_GRAPHQL_SERVER_PORT: 8080 #default 8080
+volumes:
+  db_data:
+
